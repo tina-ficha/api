@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "2OFnoWMt2pQ=",
+  "success": true,
+  "projectFilePath": "/Users/theo/dev/tina-ficha/tina-ficha.csproj",
+  "expectedPackageFiles": [
+    "/Users/theo/.nuget/packages/microsoft.aspnetcore.openapi/9.0.1/microsoft.aspnetcore.openapi.9.0.1.nupkg.sha512",
+    "/Users/theo/.nuget/packages/microsoft.openapi/1.6.17/microsoft.openapi.1.6.17.nupkg.sha512"
+  ],
+  "logs": []
+}
