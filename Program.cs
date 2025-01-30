@@ -3,6 +3,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -13,13 +14,14 @@ if (app.Environment.IsDevelopment()) // see profiles launchSettings.json
 }
 
 app.UseHttpsRedirection(); // automatically redirect http to https 
+app.UseHealthChecks("/health"); // create route 'GET /health' return OK with the body "Healthy"
 
 var summaries = new[]
 {
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 
-app.MapGet("/weatherforecast", () => // create route GET /weatherforecast
+app.MapGet("/weatherforecast", () => // create route 'GET /weatherforecast'
 {
     var forecast =  Enumerable.Range(1, 5).Select(index =>
         new WeatherForecast
@@ -39,3 +41,7 @@ record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 }
+
+
+// Controlleur `GET health`
+// return 200 => OK
