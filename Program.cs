@@ -7,19 +7,19 @@ builder.Services.AddOpenApi();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment()) // see profiles launchSettings.json
 {
-    app.MapOpenApi();
+    app.MapOpenApi(); // generate http://localhost:{port}/openapi/v1.json
 }
 
-app.UseHttpsRedirection();
+app.UseHttpsRedirection(); // automatically redirect http to https 
 
 var summaries = new[]
 {
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 
-app.MapGet("/weatherforecast", () =>
+app.MapGet("/weatherforecast", () => // create route GET /weatherforecast
 {
     var forecast =  Enumerable.Range(1, 5).Select(index =>
         new WeatherForecast
@@ -31,7 +31,7 @@ app.MapGet("/weatherforecast", () =>
         .ToArray();
     return forecast;
 })
-.WithName("GetWeatherForecast");
+.WithName("GetWeatherForecast"); // Name for OpenAPI (add endpoint Metadata)
 
 app.Run();
 
