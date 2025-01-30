@@ -7,7 +7,7 @@ namespace TinaFicha.Adpaters.Web;
 public class HealthController : ControllerBase
 {
 
-    [HttpGet]
+    [HttpGet] // GET /api/health
     public string GetHealth()
     {
         return "Healthy";
