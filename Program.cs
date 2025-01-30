@@ -3,7 +3,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-builder.Services.AddHealthChecks();
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -11,10 +11,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment()) // see profiles launchSettings.json
 {
     app.MapOpenApi(); // generate http://localhost:{port}/openapi/v1.json
+    //app.UseSwagger();
+    //app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection(); // automatically redirect http to https 
-app.UseHealthChecks("/health"); // create route 'GET /health' return OK with the body "Healthy"
+ app.UseHttpsRedirection(); // automatically redirect http to https 
 
 var summaries = new[]
 {
@@ -34,6 +35,9 @@ app.MapGet("/weatherforecast", () => // create route 'GET /weatherforecast'
     return forecast;
 })
 .WithName("GetWeatherForecast"); // Name for OpenAPI (add endpoint Metadata)
+
+
+app.MapControllers();
 
 app.Run();
 
