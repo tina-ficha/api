@@ -3,7 +3,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-builder.Services.AddControllers();
+builder.Services.AddControllers(); // reference de controllers
 
 var app = builder.Build();
 
@@ -37,7 +37,7 @@ app.MapGet("/weatherforecast", () => // create route 'GET /weatherforecast'
 .WithName("GetWeatherForecast"); // Name for OpenAPI (add endpoint Metadata)
 
 
-app.MapControllers();
+app.MapControllers(); // Adds endpoints for controller
 
 app.Run();
 
