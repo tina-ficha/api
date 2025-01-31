@@ -1,8 +1,15 @@
+using Microsoft.OpenApi.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddSwaggerGen(c =>
+{
+    // generate http://localhost:{port}/swagger/v1/swagger.json
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "TinaFicha", Version = "v1" });
+});
+builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 builder.Services.AddControllers(); // reference de controllers
 
 var app = builder.Build();
@@ -10,14 +17,10 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) // see profiles launchSettings.json
 {
-    app.MapOpenApi(); // generate http://localhost:{port}/openapi/v1.json
-    //app.UseSwagger();
-    //app.UseSwaggerUI();
+    app.UseSwagger();
+    app.UseSwaggerUI(); // generate http://localhost:{port}/swagger
 }
 
-app.UseHttpsRedirection(); // automatically redirect http to https 
-
 app.MapControllers(); // Adds endpoints for controller
-
 app.Run();
 

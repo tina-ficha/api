@@ -1,0 +1,8 @@
+services:
+  tina-ficha:
+    container_name: "tina-ficha"
+    build:
+      dockerfile: ./Dockerfile
+      target: run
+    ports:
+      - '8080:8080'
