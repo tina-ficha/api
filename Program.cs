@@ -15,37 +15,9 @@ if (app.Environment.IsDevelopment()) // see profiles launchSettings.json
     //app.UseSwaggerUI();
 }
 
- app.UseHttpsRedirection(); // automatically redirect http to https 
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () => // create route 'GET /weatherforecast'
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast"); // Name for OpenAPI (add endpoint Metadata)
-
+app.UseHttpsRedirection(); // automatically redirect http to https 
 
 app.MapControllers(); // Adds endpoints for controller
 
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
-
-
-// Controlleur `GET health`
-// return 200 => OK
