@@ -1,4 +1,6 @@
 using Microsoft.OpenApi.Models;
+using TinaFicha.Application.Publish;
+using TinaFicha.Ports.In.Publish;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 builder.Services.AddControllers(); // reference de controllers
+builder.Services.AddSingleton<PublishVideoOnPlatforms, PublishService>();
 
 var app = builder.Build();
 
