@@ -1,8 +1,8 @@
 public class Video {
-    private Stream? stream;
+    public readonly Stream Stream;
 
     private Video(Stream stream) {
-        this.stream = stream;
+        this.Stream = stream;
     }
 
     public static Video FromStream(Stream stream) {

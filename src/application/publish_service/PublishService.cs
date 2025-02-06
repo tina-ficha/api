@@ -17,7 +17,7 @@ public class PublishService : PublishVideoOnPlatforms
 
         try
             {
-                this.Run().Wait();
+                this.Run(command.video).Wait();
             }
             catch (AggregateException ex)
             {
@@ -28,26 +28,58 @@ public class PublishService : PublishVideoOnPlatforms
             }
     }
 
-    private async Task Run()
+    private async Task Run(Video video)
     {
+        // Compte TinaFicha
         UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    new ClientSecrets
+                    new ClientSecrets // OAUTH2 ~ API TOKEN 
                     {
-                        ClientId = EnvReader.GetStringValue("CLIENT_ID"),
+                        ClientId = EnvReader.GetStringValue("CLIENT_ID"), // tina ficha
                         ClientSecret = EnvReader.GetStringValue("CLIENT_SECRET"),
                     },
-                    new[] { YouTubeService.Scope.YoutubeUpload },
-                    "user",
-                    CancellationToken.None
+                    new[] { YouTubeService.Scope.YoutubeUpload }, // Scopes
+                    "user", // ??? "The user identifier"
+                    CancellationToken.None // "The cancellation token for cancelling an operation"
                 );
 
-        // Create the service.
+        // Create the service Youtube.
         var service = new YouTubeService(new BaseClientService.Initializer(){
             HttpClientInitializer = credential,
             ApplicationName = "tina-ficha-youtube"
         });
 
-        //service.Videos.Insert()
-        //var bookshelves = await service.Mylibrary.Bookshelves.List().ExecuteAsync();
+        var yb_video = new Google.Apis.YouTube.v3.Data.Video();
+        yb_video.Snippet.Title = "Test Title";
+        yb_video.Snippet.Description = "Test Video Description";
+        yb_video.Status = new Google.Apis.YouTube.v3.Data.VideoStatus
+        {
+            PrivacyStatus = "public"
+        };
+
+        var videosInsertRequest = service.Videos.Insert(yb_video, "snippet,status", video.Stream, "video/*");
+        videosInsertRequest.ProgressChanged += videosInsertRequest_ProgressChanged;
+        videosInsertRequest.ResponseReceived += videosInsertRequest_ResponseReceived;
+
+        await videosInsertRequest.UploadAsync();
+
+    }
+
+    void videosInsertRequest_ProgressChanged(Google.Apis.Upload.IUploadProgress progress)
+    {
+      switch (progress.Status)
+      {
+        case Google.Apis.Upload.UploadStatus.Uploading:
+          Console.WriteLine("{0} bytes sent.", progress.BytesSent);
+          break;
+
+        case Google.Apis.Upload.UploadStatus.Failed:
+          Console.WriteLine("An error prevented the upload from completing.\n{0}", progress.Exception);
+          break;
+      }
+    }
+
+    void videosInsertRequest_ResponseReceived(Google.Apis.YouTube.v3.Data.Video video)
+    {
+      Console.WriteLine("Video id '{0}' was successfully uploaded.", video.Id);
     }
 }
