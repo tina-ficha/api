@@ -2,6 +2,7 @@ using TinaFicha.Ports.In.Publish;
 using Google.Apis.YouTube.v3;
 using Google.Apis.Services;
 using Google.Apis.Auth.OAuth2;
+using dotenv.net;
 using dotenv.net.Utilities;
 
 
@@ -11,6 +12,7 @@ public class PublishService : PublishVideoOnPlatforms
 {
     public void Publish(PublishVideoCommand command)
     {
+        DotEnv.Load();
         // https://stackoverflow.com/questions/78801795/how-can-i-simply-use-the-youtube-api-to-upload-videos
         // Oauth identification -> service Oauth ?
         // send the vidoe to youtube api -> publishing service ?
@@ -42,11 +44,15 @@ public class PublishService : PublishVideoOnPlatforms
                     CancellationToken.None // "The cancellation token for cancelling an operation"
                 );
 
+        Console.WriteLine("Connected: " + credential.UserId);
+
         // Create the service Youtube.
         var service = new YouTubeService(new BaseClientService.Initializer(){
             HttpClientInitializer = credential,
             ApplicationName = "tina-ficha-youtube"
         });
+
+        Console.WriteLine("Youtube Service instancied", service.ToString());
 
         var yb_video = new Google.Apis.YouTube.v3.Data.Video();
         yb_video.Snippet.Title = "Test Title";
@@ -56,9 +62,13 @@ public class PublishService : PublishVideoOnPlatforms
             PrivacyStatus = "public"
         };
 
+        Console.WriteLine("Video ready: " + yb_video.Snippet.Title);
+
         var videosInsertRequest = service.Videos.Insert(yb_video, "snippet,status", video.Stream, "video/*");
         videosInsertRequest.ProgressChanged += videosInsertRequest_ProgressChanged;
         videosInsertRequest.ResponseReceived += videosInsertRequest_ResponseReceived;
+
+        Console.WriteLine("Insert Request ready: " + videosInsertRequest.Body);
 
         await videosInsertRequest.UploadAsync();
 
