@@ -400,5 +400,6 @@ FodyWeavers.xsd
 *.sln.iml
 
 *.env
+client_secret.json
 
 !src/adapters/web/publish

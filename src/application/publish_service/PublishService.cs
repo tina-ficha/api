@@ -32,19 +32,27 @@ public class PublishService : PublishVideoOnPlatforms
 
     private async Task Run(Video video)
     {
-        // Compte TinaFicha
-        UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    new ClientSecrets // OAUTH2 ~ API TOKEN 
-                    {
-                        ClientId = EnvReader.GetStringValue("CLIENT_ID"), // tina ficha
-                        ClientSecret = EnvReader.GetStringValue("CLIENT_SECRET"),
-                    },
-                    new[] { YouTubeService.Scope.YoutubeUpload }, // Scopes
-                    "user", // ??? "The user identifier"
-                    CancellationToken.None // "The cancellation token for cancelling an operation"
-                );
-
-        Console.WriteLine("Connected: " + credential.UserId);
+        var store = new Google.Apis.Util.Store.FileDataStore("Youtube.Upload");
+        Console.WriteLine("Youtube Store at : ", store.FolderPath);
+        UserCredential credential;
+        
+        credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+            new ClientSecrets // OAUTH2 ~ API TOKEN 
+            {
+                ClientId = EnvReader.GetStringValue("CLIENT_ID"), // tina ficha
+                ClientSecret = EnvReader.GetStringValue("CLIENT_SECRET"),
+            },
+            // This OAuth 2.0 access scope allows an application to upload files to the
+            // authenticated user's YouTube channel, but doesn't allow other types of access.
+            new[] { 
+                YouTubeService.Scope.Youtube, 
+                YouTubeService.Scope.YoutubeForceSsl, 
+                YouTubeService.Scope.YoutubeUpload
+                },
+            "user", // id dans le store
+            CancellationToken.None,
+            store
+        );
 
         // Create the service Youtube.
         var service = new YouTubeService(new BaseClientService.Initializer(){
@@ -52,25 +60,21 @@ public class PublishService : PublishVideoOnPlatforms
             ApplicationName = "tina-ficha-youtube"
         });
 
-        Console.WriteLine("Youtube Service instancied", service.ToString());
-
         var yb_video = new Google.Apis.YouTube.v3.Data.Video();
+        yb_video.Snippet = new Google.Apis.YouTube.v3.Data.VideoSnippet();
         yb_video.Snippet.Title = "Test Title";
         yb_video.Snippet.Description = "Test Video Description";
-        yb_video.Status = new Google.Apis.YouTube.v3.Data.VideoStatus
-        {
-            PrivacyStatus = "public"
-        };
+        yb_video.Status = new Google.Apis.YouTube.v3.Data.VideoStatus();
+        yb_video.Status.PrivacyStatus = "public";
 
-        Console.WriteLine("Video ready: " + yb_video.Snippet.Title);
 
         var videosInsertRequest = service.Videos.Insert(yb_video, "snippet,status", video.Stream, "video/*");
         videosInsertRequest.ProgressChanged += videosInsertRequest_ProgressChanged;
         videosInsertRequest.ResponseReceived += videosInsertRequest_ResponseReceived;
 
-        Console.WriteLine("Insert Request ready: " + videosInsertRequest.Body);
 
         await videosInsertRequest.UploadAsync();
+
 
     }
 
